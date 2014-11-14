@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.1.3 - 2014-11-06
+ * @version v2.1.3 - 2014-11-14
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes (olivier@mg-crea.com)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -37,7 +37,7 @@ angular.module('mgcrea.ngStrap.timepicker', ['mgcrea.ngStrap.helpers.dateParser'
       arrowBehavior: 'pager'
     };
 
-    this.$get = ["$window", "$document", "$rootScope", "$sce", "$locale", "dateFilter", "$tooltip", "$timeout", function($window, $document, $rootScope, $sce, $locale, dateFilter, $tooltip, $timeout) {
+    this.$get = ["$window", "$document", "$rootScope", "$sce", "$locale", "dateFilter", "$bsTooltip", "$timeout", function($window, $document, $rootScope, $sce, $locale, dateFilter, $bsTooltip, $timeout) {
 
       var bodyEl = angular.element($window.document.body);
       var isNative = /(ip(a|o)d|iphone|android)/ig.test($window.navigator.userAgent);
@@ -46,7 +46,7 @@ angular.module('mgcrea.ngStrap.timepicker', ['mgcrea.ngStrap.helpers.dateParser'
 
       function timepickerFactory(element, controller, config) {
 
-        var $timepicker = $tooltip(element, angular.extend({}, defaults, config));
+        var $timepicker = $bsTooltip(element, angular.extend({}, defaults, config));
         var parentScope = config.scope;
         var options = $timepicker.$options;
         var scope = $timepicker.$scope;
@@ -291,10 +291,14 @@ angular.module('mgcrea.ngStrap.timepicker', ['mgcrea.ngStrap.helpers.dateParser'
         var _show = $timepicker.show;
         $timepicker.show = function() {
           _show();
-          $timepicker.$element.on(isTouch ? 'touchstart' : 'mousedown', $timepicker.$onMouseDown);
-          if(options.keyboard) {
-            element.on('keydown', $timepicker.$onKeyDown);
-          }
+          // use timeout to hookup the events to prevent 
+          // event bubbling from being processed imediately. 
+          $timeout(function() {
+            $timepicker.$element.on(isTouch ? 'touchstart' : 'mousedown', $timepicker.$onMouseDown);
+            if(options.keyboard) {
+              element.on('keydown', $timepicker.$onKeyDown);
+            }
+          }, 0, false);
         };
 
         var _hide = $timepicker.hide;
@@ -387,12 +391,17 @@ angular.module('mgcrea.ngStrap.timepicker', ['mgcrea.ngStrap.helpers.dateParser'
           // console.warn('$parser("%s"): viewValue=%o', element.attr('ng-model'), viewValue);
           // Null values should correctly reset the model value & validity
           if(!viewValue) {
+            // BREAKING CHANGE:
+            // return null (not undefined) when input value is empty, so angularjs 1.3 
+            // ngModelController can go ahead and run validators, like ngRequired
             controller.$setValidity('date', true);
-            return;
+            return null;
           }
           var parsedTime = angular.isDate(viewValue) ? viewValue : dateParser.parse(viewValue, controller.$dateValue);
           if(!parsedTime || isNaN(parsedTime.getTime())) {
             controller.$setValidity('date', false);
+            // return undefined, causes ngModelController to 
+            // invalidate model value 
             return;
           } else {
             validateAgainstMinMaxTime(parsedTime);

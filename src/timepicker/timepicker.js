@@ -30,7 +30,7 @@ angular.module('mgcrea.ngStrap.timepicker', ['mgcrea.ngStrap.helpers.dateParser'
       arrowBehavior: 'pager'
     };
 
-    this.$get = function($window, $document, $rootScope, $sce, $locale, dateFilter, $tooltip, $timeout) {
+    this.$get = function($window, $document, $rootScope, $sce, $locale, dateFilter, $bsTooltip, $timeout) {
 
       var bodyEl = angular.element($window.document.body);
       var isNative = /(ip(a|o)d|iphone|android)/ig.test($window.navigator.userAgent);
@@ -39,7 +39,7 @@ angular.module('mgcrea.ngStrap.timepicker', ['mgcrea.ngStrap.helpers.dateParser'
 
       function timepickerFactory(element, controller, config) {
 
-        var $timepicker = $tooltip(element, angular.extend({}, defaults, config));
+        var $timepicker = $bsTooltip(element, angular.extend({}, defaults, config));
         var parentScope = config.scope;
         var options = $timepicker.$options;
         var scope = $timepicker.$scope;

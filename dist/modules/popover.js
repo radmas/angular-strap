@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.1.3 - 2014-11-06
+ * @version v2.1.3 - 2014-11-14
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes (olivier@mg-crea.com)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -28,14 +28,14 @@ angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip'])
       autoClose: false
     };
 
-    this.$get = ["$tooltip", function($tooltip) {
+    this.$get = ["$bsTooltip", function($bsTooltip) {
 
       function PopoverFactory(element, config) {
 
         // Common vars
         var options = angular.extend({}, defaults, config);
 
-        var $popover = $tooltip(element, options);
+        var $popover = $bsTooltip(element, options);
 
         // Support scope as string options [/*title, */content]
         if(options.content) {

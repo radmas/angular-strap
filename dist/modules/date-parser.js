@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.1.3 - 2014-11-06
+ * @version v2.1.3 - 2014-11-14
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes (olivier@mg-crea.com)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -138,6 +138,8 @@ angular.module('mgcrea.ngStrap.helpers.dateParser', [])
       };
 
       $dateParser.parse = function(value, baseDate, format) {
+        // check for date format special names
+        if(format) format = $locale.DATETIME_FORMATS[format] || format;
         if(angular.isDate(value)) value = dateFilter(value, format || $dateParser.$format);
         var formatRegex = format ? regExpForFormat(format) : regex;
         var formatSetMap = format ? setMapForFormat(format) : setMap;

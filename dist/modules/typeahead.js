@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.1.3 - 2014-11-06
+ * @version v2.1.3 - 2014-11-14
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes (olivier@mg-crea.com)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -28,7 +28,7 @@ angular.module('mgcrea.ngStrap.typeahead', ['mgcrea.ngStrap.tooltip', 'mgcrea.ng
       comparator: ''
     };
 
-    this.$get = ["$window", "$rootScope", "$tooltip", function($window, $rootScope, $tooltip) {
+    this.$get = ["$window", "$rootScope", "$bsTooltip", "$timeout", function($window, $rootScope, $bsTooltip, $timeout) {
 
       var bodyEl = angular.element($window.document.body);
 
@@ -39,7 +39,7 @@ angular.module('mgcrea.ngStrap.typeahead', ['mgcrea.ngStrap.tooltip', 'mgcrea.ng
         // Common vars
         var options = angular.extend({}, defaults, config);
 
-        $typeahead = $tooltip(element, options);
+        $typeahead = $bsTooltip(element, options);
         var parentScope = config.scope;
         var scope = $typeahead.$scope;
 
@@ -141,10 +141,14 @@ angular.module('mgcrea.ngStrap.typeahead', ['mgcrea.ngStrap.tooltip', 'mgcrea.ng
         var show = $typeahead.show;
         $typeahead.show = function() {
           show();
-          $typeahead.$element.on('mousedown', $typeahead.$onMouseDown);
-          if(options.keyboard) {
-            element.on('keydown', $typeahead.$onKeyDown);
-          }
+          // use timeout to hookup the events to prevent 
+          // event bubbling from being processed imediately. 
+          $timeout(function() {
+            $typeahead.$element.on('mousedown', $typeahead.$onMouseDown);
+            if(options.keyboard) {
+              element.on('keydown', $typeahead.$onKeyDown);
+            }
+          }, 0, false);
         };
 
         var hide = $typeahead.hide;
